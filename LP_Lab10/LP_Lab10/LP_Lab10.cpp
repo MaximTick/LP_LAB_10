@@ -1,0 +1,48 @@
+#include "stdafx.h"
+#include<iostream>
+#include<locale>
+#include<cwchar>
+
+#include "Error.h" // обработка ошибок
+#include "Parm.h" //обработка параметров
+#include "Log.h" // работа с протоколом 
+#include "In.h" // ввод исходного фала 
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	setlocale(LC_CTYPE, "rus");
+	
+
+	std::cout << "---тест In:getin---" << std::endl << std::endl;
+	try {
+		Parm::PARM parm = Parm::getparm(argc, argv);
+		In::IN in = In::getin(parm.in);
+		std::cout << in.text << std::endl;
+		std::cout << "Всего символов: " << in.size << std::endl;
+		std::cout << "Всего строк: " << in.lines + 1 << std::endl;
+		std::cout << "Пропущено: " << in.ignor << std::endl;
+	}
+	catch (Error::ERROR e) {
+		std::cout << "Ошибка " << e.id << ": " << e.message << std::endl << std::endl;
+		std::cout << "Строка " << e.inext.line + 1 << " позиция " << e.inext.col << std::endl << std::endl;;
+	};
+
+	Log::LOG log = Log::INTLOG;
+	try
+	{
+		Parm::PARM parm = Parm::getparm(argc, argv);
+		log = Log::getlog(parm.log);
+		Log::WriteLine(log, "Тест:", " без ошибок \n", "");
+		Log::WriteLine(log, L"Тест:", L" без ошибок \n", L"");
+		Log::WriteLog(log);
+		Log::WriteParm(log, parm);
+		In::IN in = In::getin(parm.in);
+		Log::WriteIn(log, in);
+		Log::Close(log);
+	}
+	catch (Error::ERROR e) {
+		Log::WriteError(log, e);
+	};
+	system("pause");
+	return 0;
+};
